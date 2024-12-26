@@ -2,7 +2,6 @@ import { patchState, signalStore, withHooks, withMethods, withState } from '@ngr
 import { Course } from '../Model/AllBaseModel';
 import { inject, signal } from '@angular/core';
 import { CourseService } from '../Services/course.service';
-import { catchError, finalize, tap } from 'rxjs';
 
 
 export type CourseState = {
@@ -22,17 +21,30 @@ export const courseStore = signalStore(
   withState(initialState),
   withMethods ((store, courseServ: CourseService = inject(CourseService)) => (
     {
-        loadAll() : void {
-        courseServ.getAllCourses().subscribe({
-          next: (courses) => {
-            console.log(courses);
-            patchState(store, { courses });
+      loadAll() : void {
+      courseServ.getAllCourses().subscribe({
+        next: (courses) => {
+          console.log(courses);
+          patchState(store, { courses });
+        },
+        error: (error) => {
+          console.error(error);
+          error = error.message;
+        }
+      });
+      },
+      AddCourse(course: Course) : void {
+        courseServ.createCourse(course).subscribe({
+          next: (crs) => {
+            patchState(store, (state) => ({ courses: [...state.courses, crs] }))
           },
           error: (error) => {
             console.error(error);
+            error = error.message;
           }
         });
-       }
+      }
+       
     }
   )),
   withHooks({

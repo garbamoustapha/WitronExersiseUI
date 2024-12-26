@@ -20,7 +20,7 @@ export class CategoryService {
   }
 
   createCategory(category: Category): Observable<Category> {
-    return this.http.post<Category>(`${this.apiUrl}/categories`, category)
+    return this.http.post<Category>(`${this.apiUrl}`, category)
   }
 
   updateCategory(id: string, category: Category): Observable<Category> {

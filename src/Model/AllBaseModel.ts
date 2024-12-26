@@ -1,18 +1,16 @@
 export type BaseModel = {
-    id: string;
+    id: string | null;
     description: string;
     createdDate: Date;  
 }
 
 export type Category = BaseModel & {
-    Name : string;
+    name : string;
 }
 
 export type Course = BaseModel & {
-    Title : string;
-    InstructorName : string;
-    StartDate : Date;
-    EndDate : Date;
-    CategoryId: string;
-    Category : Category ;
+    title : string;
+    instructorName : string;
+    categoryId: string;
+    category : Category | null;
 }

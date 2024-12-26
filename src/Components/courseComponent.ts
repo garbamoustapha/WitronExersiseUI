@@ -2,7 +2,13 @@ import { Component, inject } from "@angular/core";
 // Angular Data Grid Component
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef } from 'ag-grid-community';
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
+import { 
+  AllCommunityModule, 
+  ModuleRegistry, 
+  RowSelectionOptions, 
+  GetRowIdFunc, 
+  GetRowIdParams 
+} from 'ag-grid-community'; 
 
 import {MatButtonModule} from '@angular/material/button';
 
@@ -16,13 +22,7 @@ import { HttpClientModule } from '@angular/common/http';
 
 //Dialog import
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
 } from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
@@ -41,17 +41,18 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     MatButtonModule
   ],
   template:`
-  <h1>All courses</h1>
+    <h1>All courses</h1>
     <ag-grid-angular
-        style="width: 100%; height: 500px;"
-        [rowData]="store.courses()"
-        [columnDefs]="colDefs"
-        [pagination]="true"
-        [paginationPageSize]="10"
-        [paginationPageSizeSelector]="[10,20]"
-        [defaultColDef]="defaultColDef"
-        rowSelection="multiple" />
-        <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New course</button>
+      style="width: 100%; height: 500px;"
+      [rowData]="store.courses()"
+      [columnDefs]="colDefs"
+      [pagination]="true"
+      [paginationPageSize]="10"
+      [paginationPageSizeSelector]="[10,20]"
+      [defaultColDef]="defaultColDef"
+      [rowSelection]="rowSelection"
+      [getRowId]="getRowId" />
+    <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New course</button>
       `,
   styles: [`
     h1{
@@ -83,14 +84,24 @@ export class CourseComponent {
 
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-      { 
-        field: "title" ,
-        checkboxSelection: true,      
-      },
-      { field: "description" },
-      { field: "instructorName" },
-      { field: "date-related information"}  
+    { 
+      field: "title" ,
+      checkboxSelection: true,      
+    },
+    { field: "description" },
+    { field: "instructorName" },
+    { field: "category" , valueGetter: (params) => params.data.category.name },  
+    { field: "createdDate"},  
   ];
+
+  public rowSelection: RowSelectionOptions | "single" | "multiple" = {
+    mode: "singleRow",
+    checkboxes: false,
+    enableClickSelection: true,
+  };
+
+  public getRowId : GetRowIdFunc = (params: GetRowIdParams<Course>) =>
+     params.data.id ?? "";
 
   readonly dialog = inject(MatDialog);
 
@@ -106,5 +117,3 @@ export class CourseComponent {
     this.dialog.open(CreateCourseDialogComponent);
   }
 } 
-
-

@@ -1,24 +1,24 @@
 import { Component, computed, inject, signal } from "@angular/core";
 import { AgGridAngular } from "ag-grid-angular";
 import type { ColDef } from 'ag-grid-community';
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'; 
+import { 
+  AllCommunityModule, 
+  ModuleRegistry ,
+  GetRowIdParams,
+  GetRowIdFunc
+} from 'ag-grid-community'; 
 import {MatButtonModule} from '@angular/material/button';
 import { CategoryStore } from "../../Stores/Category.store";
 
 //Dialog import
 import {
-  MAT_DIALOG_DATA,
   MatDialog,
-  MatDialogActions,
-  MatDialogClose,
-  MatDialogContent,
-  MatDialogRef,
-  MatDialogTitle,
+ 
 } from '@angular/material/dialog';
-import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 
 import { CreatCategoryDialogComponent } from './CreatCategoryDialogComponent';
+import { Category } from "../../Model/AllBaseModel";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -29,7 +29,6 @@ ModuleRegistry.registerModules([AllCommunityModule]);
   imports: [
     AgGridAngular, 
     MatButtonModule,
-    MatFormFieldModule,
     MatInputModule,
     MatButtonModule
   ],
@@ -44,8 +43,9 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         [paginationPageSize]="10"
         [paginationPageSizeSelector]="[10, 20]"
         [defaultColDef]="defaultColDef"
-        rowSelection="multiple" />
-        <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New category</button>        
+        [getRowId]="getRowId"        rowSelection="multiple" />
+      <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New category</button>
+    </div>        
   `,
   styles: [
     `
@@ -81,6 +81,9 @@ export class CategoriesComponent {
       { field: "description" , flex: 2},
       { field: "createdDate"},
   ];
+
+  public getRowId : GetRowIdFunc = (params: GetRowIdParams<Category>) =>
+    params.data.id ?? "";
 
   readonly dialog = inject(MatDialog);
   categoryStrore = inject(CategoryStore);

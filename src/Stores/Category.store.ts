@@ -29,6 +29,19 @@ export const CategoryStore = signalStore(
           console.error(error);
         }
       });
+    },
+    async addCategory(category: Category): Promise<boolean> {
+       await categoryService.createCategory(category).subscribe({
+        next: (cat) => {
+          patchState(store, (state) => ({ categories: [...state.categories, cat] }))
+          return true;
+        },
+        error: (error) => {
+          console.error(error);
+          return false;
+        }        
+      });
+      return false;
     }
   })) 
 );
