@@ -14,7 +14,7 @@ import {FormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button';
 import { Category } from '../../Model/AllBaseModel';
 import { CategoryStore } from '../../Stores/Category.store';
-
+import { SnackBarUtility } from '../../Utility/snackBar.utility';
 
 @Component({
   selector: 'app-creat-category-dialog',
@@ -64,6 +64,7 @@ export class CreatCategoryDialogComponent {
 
   readonly dialogRef = inject(MatDialogRef);
   readonly categoryStore = inject(CategoryStore);
+  snakbar = inject(SnackBarUtility);
   categoryModel : Category = {
     id: "",
     name: "",
@@ -84,9 +85,11 @@ export class CreatCategoryDialogComponent {
     this.categoryStore.addCategory(this.categoryModel)
     .then((r : boolean) => {
       this.CloseDialog();
+      this.snakbar.openSnackBar("Category created", "Close");
     })
     .catch((error) => {
       console.error("Erreur :", error);
+      this.snakbar.openSnackBar("Category can't be created", "Close");
     })     
   }
 }

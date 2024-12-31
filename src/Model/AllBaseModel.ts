@@ -7,8 +7,7 @@ export type BaseModel = {
 export type Category = BaseModel & {
     name : string;
 }
-
-export type Course = BaseModel & {
+export type Course = BaseModel & {  
     title : string;
     instructorName : string;
     categoryId: string;

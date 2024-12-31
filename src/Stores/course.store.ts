@@ -21,17 +21,17 @@ export const courseStore = signalStore(
   withState(initialState),
   withMethods ((store, courseServ: CourseService = inject(CourseService)) => (
     {
-      loadAll() : void {
-      courseServ.getAllCourses().subscribe({
-        next: (courses) => {
-          console.log(courses);
-          patchState(store, { courses });
-        },
-        error: (error) => {
-          console.error(error);
-          error = error.message;
-        }
-      });
+       loadAll() :void {
+         courseServ.getAllCourses().subscribe({
+          next: (courses) => {
+            console.log(courses);
+            patchState(store, { courses });
+          },
+          error: (error) => {
+            console.error(error);
+            patchState(store, (state) => ({ courses: state.courses ,error: error.message }));
+          }
+        });
       },
       AddCourse(course: Course) : void {
         courseServ.createCourse(course).subscribe({
@@ -40,11 +40,32 @@ export const courseStore = signalStore(
           },
           error: (error) => {
             console.error(error);
-            error = error.message;
+            patchState(store, (state) => ({ courses: state.courses ,error: error.message }));
           }
         });
-      }
-       
+      },
+      UpdateCourse(course: Course) : void {
+        courseServ.updateCourse(course).subscribe({
+          next: (crs) => {
+            patchState(store, (state) => ({ courses: state.courses.map(c => c.id === crs.id ? crs : c) }))
+          },
+          error: (error) => {
+            console.error(error);
+            patchState(store, (state) => ({ courses: state.courses ,error: error.message }));
+          }
+        });
+      },
+      DeleteCourse(id: string) : void {
+        courseServ.deleteCourse(id).subscribe({
+          next: () => {
+            patchState(store, (state) => ({ courses: state.courses.filter(c => c.id !== id) }))
+          },
+          error: (error) => {
+            console.error(error);
+            patchState(store, (state) => ({ courses: state.courses ,error: error.message }));
+          }
+        });
+      }       
     }
   )),
   withHooks({

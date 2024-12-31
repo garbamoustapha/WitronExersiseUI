@@ -1,24 +1,21 @@
-import { Component, inject } from "@angular/core";
+import { Component, computed, inject, effect, signal } from "@angular/core";
 // Angular Data Grid Component
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef } from 'ag-grid-community';
 import { 
   AllCommunityModule, 
   ModuleRegistry, 
-  RowSelectionOptions, 
+  GridApi, 
   GetRowIdFunc, 
-  GetRowIdParams 
+  GetRowIdParams,
 } from 'ag-grid-community'; 
 
 import {MatButtonModule} from '@angular/material/button';
 
 import { CreateCourseDialogComponent } from './CreateCourseDialogComponent';
-
 import { courseStore } from "../Stores/course.store";
-import { HttpClientModule } from '@angular/common/http';
-
-
-
+import { CategoryStore } from "../Stores/Category.store";
+import {MatIconModule} from '@angular/material/icon';
 
 //Dialog import
 import {
@@ -26,7 +23,9 @@ import {
 } from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import { Course } from "../Model/AllBaseModel";
+import { Category, Course } from "../Model/AllBaseModel";
+
+import { SnackBarUtility } from "../Utility/snackBar.utility";
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -38,10 +37,16 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     AgGridAngular,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule
+    MatButtonModule,
+    MatIconModule
   ],
   template:`
-    <h1>All courses</h1>
+    <div class="header">
+      <h1 >All courses</h1>
+      <button mat-fab class="delete-button" [disabled]="!hasSelectedRows" (click)="deleteCourses()" >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
     <ag-grid-angular
       style="width: 100%; height: 500px;"
       [rowData]="store.courses()"
@@ -50,16 +55,16 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       [paginationPageSize]="10"
       [paginationPageSizeSelector]="[10,20]"
       [defaultColDef]="defaultColDef"
-      [rowSelection]="rowSelection"
-      [getRowId]="getRowId" />
+      [rowSelection]="'multiple'"
+      [readOnlyEdit]="true"
+      [getRowId]="getRowId"
+      (gridReady)="onGridReady($event)"
+      (selectionChanged)="onSelectionChanged()"
+      (cellEditRequest)="onCellValueChanged($event)"/>
     <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New course</button>
       `,
   styles: [`
-    h1{
-      text-align: left;
-      font-weight: bold;
-      margin:20px 50px ;
-    }
+
     .mat-button{
       position: absolute;
       bottom:0;right:0;
@@ -77,35 +82,87 @@ export class CourseComponent {
     flex: 1,
     editable:true
   }
+
   store = inject(courseStore);
+  categoryStore = inject(CategoryStore);
+  readonly dialog = inject(MatDialog);
+  snakbar = inject(SnackBarUtility);
 
-  // Row Data: The data to be displayed.
-  rowData : Course [] = [];
-
-  // Column Definitions: Defines the columns to be displayed.
-  colDefs: ColDef[] = [
-    { 
-      field: "title" ,
-      checkboxSelection: true,      
-    },
-    { field: "description" },
-    { field: "instructorName" },
-    { field: "category" , valueGetter: (params) => params.data.category.name },  
-    { field: "createdDate"},  
-  ];
-
-  public rowSelection: RowSelectionOptions | "single" | "multiple" = {
-    mode: "singleRow",
-    checkboxes: false,
-    enableClickSelection: true,
-  };
+  colDefs: ColDef[] = [];
+  gridApi: GridApi | undefined;
+  hasSelectedRows = false;
+ 
 
   public getRowId : GetRowIdFunc = (params: GetRowIdParams<Course>) =>
      params.data.id ?? "";
 
-  readonly dialog = inject(MatDialog);
 
-  constructor() { }
+  constructor() {
+    this.categoryStore.loadAll();
+    effect(() => {
+      console.log(this.categoryStore.categories());
+      if (this.categoryStore.categories().length > 0) {
+        this.initColDefs();
+      }
+    })
+   }
+
+  initColDefs() { 
+    this.colDefs =  [
+      { 
+        field: "title" ,
+        checkboxSelection: true,
+        editable: true     
+      },
+      { 
+        field: "description", 
+        editable: true 
+      },
+      { 
+        field: "instructorName", 
+        editable: true
+      },
+      { 
+        field: "category" , 
+        valueGetter: (params) => params.data.category.name,        
+        editable: true,
+        cellEditor: 'agSelectCellEditor',
+        cellEditorParams: {
+          values: this.categoryStore.categories().map((cat) => `${cat.name} ${cat.id}`),
+          valueListMaxWidth: 450
+        }
+      },  
+      { 
+        field: "createdDate", 
+        editable: false
+      },  
+    ];
+  }
+
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+  }
+  
+  onSelectionChanged(): void {
+    this.hasSelectedRows = this.gridApi?.getSelectedRows().length == undefined ? false :
+                           this.gridApi?.getSelectedRows().length > 0 ? true : false;
+  }
+
+  onCellValueChanged(param: any): void {
+    var updatedRow : Course;
+    if(param.colDef.field === "category") {
+      const categoryid = param.newValue.split(" ").pop();
+      if(categoryid === param.data.categoryId) {
+        return;        
+      }
+      updatedRow = { ...param.data, categoryId: categoryid };
+    }
+    else {
+      updatedRow = { ...param.data, [param.colDef.field]: param.newValue };
+    }
+    this.store.UpdateCourse(updatedRow);
+    this.snakbar.openSnackBar("Course updated", "Close");
+  }
 
   ngOnInit() { 
     this.store.loadAll();
@@ -115,5 +172,18 @@ export class CourseComponent {
   OpenAddCourseDialog() : void
   {
     this.dialog.open(CreateCourseDialogComponent);
+  }
+  
+  deleteCourses(): void {
+    if(!this.hasSelectedRows) return;
+    if(!confirm("Are you sure you want to delete the selected courses?")) return;
+
+    const selectedNodes = this.gridApi?.getSelectedNodes();
+    if (selectedNodes) {
+      selectedNodes.forEach(node => {
+        this.store.DeleteCourse(node.data.id);
+      });
+    }
+    this.snakbar.openSnackBar("Course(s) deleted", "Close");
   }
 } 

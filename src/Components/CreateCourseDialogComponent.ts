@@ -1,21 +1,19 @@
 import {ChangeDetectionStrategy, Component, inject, model, signal} from '@angular/core';
 import {
-  MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatInputModule} from '@angular/material/input';
-import {FormsModule} from '@angular/forms';
-import {MatButtonModule} from '@angular/material/button';
-import {MatSelectModule} from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSelectModule } from '@angular/material/select';
 import { Course } from '../Model/AllBaseModel';
 import { CategoryStore } from '../Stores/Category.store';
 import { courseStore } from '../Stores/course.store';
+import { SnackBarUtility } from '../Utility/snackBar.utility';
 
 @Component({
   selector: 'app-create-course-dialog',
@@ -80,6 +78,8 @@ export class CreateCourseDialogComponent {
   readonly dialogRef = inject(MatDialogRef<CreateCourseDialogComponent>);
   readonly categoryStore = inject(CategoryStore);
   readonly courseStore = inject(courseStore);
+  snakbar = inject(SnackBarUtility);
+
   courseModel : Course = {
     id: null,
     title: "",
@@ -96,6 +96,7 @@ export class CreateCourseDialogComponent {
   createCourse() {
     
     this.courseStore.AddCourse(this.courseModel);
+    this.snakbar.openSnackBar("Course created", "Close");
     this.CloseDialog()
   }
 
