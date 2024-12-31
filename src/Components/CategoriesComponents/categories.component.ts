@@ -18,7 +18,7 @@ import {
 import {MatInputModule} from '@angular/material/input';
 import {MatIconModule} from '@angular/material/icon';
 
-import { CreatCategoryDialogComponent } from './CreatCategoryDialogComponent';
+import { CreatCategoryDialogComponent } from './createCategoryDialog.component';
 import { Category } from "../../Model/AllBaseModel";
 
 import {SnackBarUtility} from '../../Utility/snackBar.utility';
@@ -85,8 +85,8 @@ export class CategoriesComponent {
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
       { 
-        field: "Number" ,
-        valueGetter : (params) => params.node?.rowIndex != null ? params.node.rowIndex + 1 : "null",
+        field: "Id" ,
+        valueGetter : (params) => params.data.id,
         checkboxSelection: true,             
       },
       { field: "name" },

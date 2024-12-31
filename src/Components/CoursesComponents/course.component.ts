@@ -12,9 +12,9 @@ import {
 
 import {MatButtonModule} from '@angular/material/button';
 
-import { CreateCourseDialogComponent } from './CreateCourseDialogComponent';
-import { courseStore } from "../Stores/course.store";
-import { CategoryStore } from "../Stores/Category.store";
+import { CreateCourseDialogComponent } from './createCourseDialog.component';
+import { courseStore } from "../../Stores/course.store";
+import { CategoryStore } from "../../Stores/Category.store";
 import {MatIconModule} from '@angular/material/icon';
 
 //Dialog import
@@ -23,9 +23,9 @@ import {
 } from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import { Category, Course } from "../Model/AllBaseModel";
+import { Category, Course } from "../../Model/AllBaseModel";
 
-import { SnackBarUtility } from "../Utility/snackBar.utility";
+import { SnackBarUtility } from "../../Utility/snackBar.utility";
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);

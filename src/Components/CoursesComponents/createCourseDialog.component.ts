@@ -10,10 +10,10 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { Course } from '../Model/AllBaseModel';
-import { CategoryStore } from '../Stores/Category.store';
-import { courseStore } from '../Stores/course.store';
-import { SnackBarUtility } from '../Utility/snackBar.utility';
+import { Course } from '../../Model/AllBaseModel';
+import { CategoryStore } from '../../Stores/Category.store';
+import { courseStore } from '../../Stores/course.store';
+import { SnackBarUtility } from '../../Utility/snackBar.utility';
 
 @Component({
   selector: 'app-create-course-dialog',
