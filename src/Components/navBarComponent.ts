@@ -1,41 +1,51 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import {MatSidenavModule} from '@angular/material/sidenav';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatIconModule} from '@angular/material/icon';
+import { RouterOutlet } from '@angular/router';
+
 
 @Component({
   selector: 'nav-bar',
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, MatSidenavModule, MatToolbarModule, MatIconModule, RouterOutlet],
   template: `
-  <nav class="navbar">
-    <!-- Logo Section -->
-    <div class="navbar-logo">
-      <span class="navbar-title">
-        <a class="TitleLink" routerLink="/"  ariaCurrentWhenActive="page">Learn</a>
-      </span>
-    </div>
-
-    <!-- Navigation Links -->
-    <ul class="navbar-links">
-      <li>
-        <a routerLink="/Courses" routerLinkActive="active" ariaCurrentWhenActive="page" class="navbar-link">Courses</a>
-      </li>
-      <li>
-        <a routerLink="/Categories" routerLinkActive="active" ariaCurrentWhenActive="page" class="navbar-link">Category</a>
-      </li>
-    </ul>
-  </nav>
+    <nav class="navbar">
+      <!-- Logo Section -->
+      <mat-toolbar>
+        <button mat-icon-button class="example-icon" mat-button (click)="drawer.toggle()">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <div class="navbar-logo" style="margin: 10px; font-size: 30px;">
+          <span class="navbar-title">
+            <a class="TitleLink" routerLink="/"  ariaCurrentWhenActive="page">Learn</a>
+          </span>
+        </div>  
+      </mat-toolbar>
+    </nav>
+    <mat-drawer-container class="example-container" autosize  >
+      <mat-drawer #drawer class="example-sidenav" mode="side" style="width: 15%;">
+      <!-- Navigation Links -->
+        <ul class="navbar-links">
+          <li>
+            <a routerLink="/Courses" routerLinkActive="active" ariaCurrentWhenActive="page" class="navbar-link">Courses</a>
+          </li>
+          <li>
+            <a routerLink="/Categories" routerLinkActive="active" ariaCurrentWhenActive="page" class="navbar-link">Category</a>
+          </li>
+        </ul>
+      </mat-drawer>
+      <router-outlet />
+    </mat-drawer-container>
   `,
   styles: [`
-  .navbar {
-    display: flex;
-    align-items: center;
-    padding: 20px 20px;
+  .navbar {   
     background-color: aliceblue;
     border-bottom: 1px solid #ddd;
     font-family: Arial, sans-serif;
     justify-content: space-between;
     font-size: 30px;
-    margin-bottom: 20px;
   }
 
   .navbar-title {
@@ -49,19 +59,18 @@ import { CommonModule } from '@angular/common';
 
   .navbar-links {
     list-style: none;
-    display: flex;
-    gap: 20px;
-    margin: 0 auto;
-    padding: 0;
-  }
+    padding: 0 10px;
+$  }
 
   .navbar-link {
     text-decoration: none;
+    display: block;
     font-size: 20px;
     color: rgb(8, 107, 212);
     padding: 8px 16px;
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
+    margin: 10px 0;
   }
 
   .navbar-link:hover {
