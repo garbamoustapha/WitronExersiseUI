@@ -26,6 +26,7 @@ import {MatInputModule} from '@angular/material/input';
 import { Category, Course } from "../../Model/AllBaseModel";
 
 import { SnackBarUtility } from "../../Utility/snackBar.utility";
+import { AgGridActionsComponent } from "../../Utility/aggridActions.component";
 
 // Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -38,7 +39,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
   ],
   template:`
     <div class="header">
@@ -96,6 +97,7 @@ export class CourseComponent {
   public getRowId : GetRowIdFunc = (params: GetRowIdParams<Course>) =>
      params.data.id ?? "";
 
+  AgGridActionsComponent = AgGridActionsComponent; // Ag Grid Actions Component
 
   constructor() {
     this.categoryStore.loadAll();
@@ -135,8 +137,30 @@ export class CourseComponent {
       { 
         field: "createdDate", 
         editable: false
-      },  
+      }, 
+        { 
+        field: "Actions", 
+        editable: false,
+        cellRenderer: AgGridActionsComponent,
+        filter: false,
+        cellRendererParams: {
+          deleteBtnClick: (rowData: Course) => {
+            if(rowData.id)
+              this.deleteCourse(rowData.id);
+          },
+          updateBtnClick: (rowData: Course) => {
+            if(rowData)
+              this.OpenAddCourseDialog(rowData);        
+          }
+        }      
+      }, 
+       
     ];
+  }
+
+  onActionBtnClick(): void {
+    console.log('Action button clicked!');
+    // Add your functionality here
   }
 
   onGridReady(params: any) {
@@ -169,9 +193,9 @@ export class CourseComponent {
     console.log(this.store.courses());
   }
 
-  OpenAddCourseDialog() : void
+  OpenAddCourseDialog(course : Course | undefined = undefined) : void
   {
-    this.dialog.open(CreateCourseDialogComponent);
+    this.dialog.open(CreateCourseDialogComponent, { data:course});
   }
   
   deleteCourses(): void {
@@ -184,6 +208,12 @@ export class CourseComponent {
         this.store.DeleteCourse(node.data.id);
       });
     }
+    this.snakbar.openSnackBar("Course(s) deleted", "Close");
+  }
+
+  deleteCourse(CourseId: string): void {
+    if(!confirm("Are you sure you want to delete the selected courses?")) return;
+    this.store.DeleteCourse(CourseId);
     this.snakbar.openSnackBar("Course(s) deleted", "Close");
   }
 } 

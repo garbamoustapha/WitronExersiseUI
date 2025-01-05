@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, inject, model, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, model, signal, Signal} from '@angular/core';
 import {
   MatDialogActions,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
+  MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -14,6 +15,7 @@ import { Course } from '../../Model/AllBaseModel';
 import { CategoryStore } from '../../Stores/Category.store';
 import { courseStore } from '../../Stores/course.store';
 import { SnackBarUtility } from '../../Utility/snackBar.utility';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-create-course-dialog',
@@ -27,23 +29,23 @@ import { SnackBarUtility } from '../../Utility/snackBar.utility';
     MatDialogActions,
     MatSelectModule
     ],
-  template: `<h2 mat-dialog-title>Create new course</h2>
+  template: `<h2 mat-dialog-title>{{data.id ? "Edit Course" : "Create Course"}}</h2>
   <mat-dialog-content>
     <mat-form-field>
       <mat-label>Title</mat-label>
-      <input matInput [(ngModel)]= "courseModel.title" />
+      <input matInput [(ngModel)]= "courseModel.title" name="title" />
     </mat-form-field>
     <mat-form-field>
       <mat-label>Description</mat-label>
-      <textarea matInput  [(ngModel)]= "courseModel.description"> </textarea>
+      <textarea matInput  [(ngModel)]= "courseModel.description" name="description"> </textarea>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Instructor name</mat-label>
-      <input matInput  [(ngModel)]= "courseModel.instructorName" />
+      <input matInput  [(ngModel)]= "courseModel.instructorName" name="instructorName" />
     </mat-form-field>
     <mat-form-field>
       <mat-label>Category</mat-label>
-      <mat-select  [(ngModel)]= "courseModel.categoryId">
+      <mat-select  [(ngModel)]= "courseModel.categoryId" name="categoryId">
         @for ( cat of categoryStore.categories(); track cat.id) {
           <mat-option value="{{cat.id}}">{{cat.name}}</mat-option>
         }    
@@ -53,7 +55,7 @@ import { SnackBarUtility } from '../../Utility/snackBar.utility';
   
   <mat-dialog-actions>
     <button mat-button (click)="CloseDialog()" >Close</button>
-    <button mat-button  cdkFocusInitial (click)="createCourse()">Create</button>
+    <button mat-button  cdkFocusInitial (click)="createOrEditCourse()">{{data.id ? "Update" : "Create"}}</button>
   </mat-dialog-actions>`,
   styles: [`
     h2{
@@ -78,9 +80,10 @@ export class CreateCourseDialogComponent {
   readonly dialogRef = inject(MatDialogRef<CreateCourseDialogComponent>);
   readonly categoryStore = inject(CategoryStore);
   readonly courseStore = inject(courseStore);
+  readonly data = inject<Course>(MAT_DIALOG_DATA);
   snakbar = inject(SnackBarUtility);
 
-  courseModel : Course = {
+  initCourse : Course = {
     id: null,
     title: "",
     description: "",
@@ -88,16 +91,38 @@ export class CreateCourseDialogComponent {
     instructorName: "",
     categoryId: "",
     category: null
-  };
+  }
+
+
+  courseModel =this.data ? this.data : this.initCourse;
+
+  
   ngOnInit(): void {
+
     this.categoryStore.loadAll();
   }
 
-  createCourse() {
-    
+  createOrEditCourse() {
+    if(this.courseModel.id){
+      this.updateCourse();
+    }
+    else{
+      this.createCourse();
+    }
+  }
+
+  createCourse() { 
+    console.log(this.courseModel);
     this.courseStore.AddCourse(this.courseModel);
     this.snakbar.openSnackBar("Course created", "Close");
     this.CloseDialog()
+  }
+
+  updateCourse() {
+    console.log(this.courseModel);
+    this.courseStore.UpdateCourse(this.courseModel);
+    this.snakbar.openSnackBar("Course updated", "Close");
+    this.CloseDialog();
   }
 
   CloseDialog()

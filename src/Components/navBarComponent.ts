@@ -11,6 +11,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'nav-bar',
   imports: [RouterLink, RouterLinkActive, CommonModule, MatSidenavModule, MatToolbarModule, MatIconModule, RouterOutlet],
   template: `
+  <div class="container">
     <nav class="navbar">
       <!-- Logo Section -->
       <mat-toolbar>
@@ -24,8 +25,8 @@ import { RouterOutlet } from '@angular/router';
         </div>  
       </mat-toolbar>
     </nav>
-    <mat-drawer-container class="example-container" autosize  >
-      <mat-drawer #drawer class="example-sidenav" mode="side" style="width: 15%;">
+    <mat-drawer-container class="example-container" autosize>
+      <mat-drawer #drawer class="sidenav" mode="side" style="width: 15%;">
       <!-- Navigation Links -->
         <ul class="navbar-links">
           <li>
@@ -38,8 +39,14 @@ import { RouterOutlet } from '@angular/router';
       </mat-drawer>
       <router-outlet />
     </mat-drawer-container>
+</div>
   `,
   styles: [`
+
+  .container{
+    display: flex;
+    flex-direction: column; 
+  }
   .navbar {   
     background-color: aliceblue;
     border-bottom: 1px solid #ddd;
@@ -57,10 +64,21 @@ import { RouterOutlet } from '@angular/router';
     color: rgb(4, 70, 139);
   }
 
+  .sidenav{
+    height : 100vh;
+    border-radius: 0px;
+  }
+
+  .example-container{
+    flex-direction: row;
+    height: 90vh;
+    background-color: #f4f4f4;
+  }
+
   .navbar-links {
     list-style: none;
     padding: 0 10px;
-$  }
+  }
 
   .navbar-link {
     text-decoration: none;
