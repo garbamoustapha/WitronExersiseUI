@@ -18,6 +18,8 @@ import { SnackBarUtility } from '../../Utility/snackBar.utility';
 import { Title } from '@angular/platform-browser';
 
 @Component({
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-create-course-dialog',
   imports: [
     MatFormFieldModule,
@@ -33,19 +35,19 @@ import { Title } from '@angular/platform-browser';
   <mat-dialog-content>
     <mat-form-field>
       <mat-label>Title</mat-label>
-      <input matInput [(ngModel)]= "courseModel.title" name="title" />
+      <input matInput [(ngModel)]= "courseModel().title" name="title" required/>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Description</mat-label>
-      <textarea matInput  [(ngModel)]= "courseModel.description" name="description"> </textarea>
+      <textarea matInput  [(ngModel)]= "courseModel().description" name="description" required> </textarea>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Instructor name</mat-label>
-      <input matInput  [(ngModel)]= "courseModel.instructorName" name="instructorName" />
+      <input matInput  [(ngModel)]= "courseModel().instructorName" name="instructorName" required />
     </mat-form-field>
     <mat-form-field>
       <mat-label>Category</mat-label>
-      <mat-select  [(ngModel)]= "courseModel.categoryId" name="categoryId">
+      <mat-select  [(ngModel)]= "courseModel().categoryId" name="categoryId" required>
         @for ( cat of categoryStore.categories(); track cat.id) {
           <mat-option value="{{cat.id}}">{{cat.name}}</mat-option>
         }    
@@ -73,7 +75,6 @@ import { Title } from '@angular/platform-browser';
       background-color: #fff;
     }
     `],
-  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateCourseDialogComponent {
   
@@ -94,7 +95,7 @@ export class CreateCourseDialogComponent {
   }
 
 
-  courseModel =this.data ? this.data : this.initCourse;
+  courseModel = model(this.data ? {...this.data} : this.initCourse);
 
   
   ngOnInit(): void {
@@ -103,7 +104,7 @@ export class CreateCourseDialogComponent {
   }
 
   createOrEditCourse() {
-    if(this.courseModel.id){
+    if(this.courseModel().id){
       this.updateCourse();
     }
     else{
@@ -112,17 +113,22 @@ export class CreateCourseDialogComponent {
   }
 
   createCourse() { 
-    console.log(this.courseModel);
-    this.courseStore.AddCourse(this.courseModel);
-    this.snakbar.openSnackBar("Course created", "Close");
-    this.CloseDialog()
+    this.courseStore.AddCourse(this.courseModel()).then(() =>{
+      this.snakbar.openSnackBar("Course created", "Close");
+      this.CloseDialog()
+    }).catch(() => {
+      this.snakbar.openSnackBar("Course can't be created", "Close");
+    }); 
   }
 
   updateCourse() {
-    console.log(this.courseModel);
-    this.courseStore.UpdateCourse(this.courseModel);
-    this.snakbar.openSnackBar("Course updated", "Close");
-    this.CloseDialog();
+    this.courseStore.UpdateCourse(this.courseModel()).then(() =>{
+      this.snakbar.openSnackBar("Course updated", "Close");   
+      this.CloseDialog();
+    }).catch(() =>{
+      this.snakbar.openSnackBar("Course can't be updated", "Close");
+    });
+   
   }
 
   CloseDialog()

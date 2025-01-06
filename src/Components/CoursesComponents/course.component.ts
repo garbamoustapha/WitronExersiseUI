@@ -1,4 +1,4 @@
-import { Component, computed, inject, effect, signal } from "@angular/core";
+import { Component, computed, inject, effect, ChangeDetectionStrategy } from "@angular/core";
 // Angular Data Grid Component
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef } from 'ag-grid-community';
@@ -32,6 +32,8 @@ import { AgGridActionsComponent } from "../../Utility/aggridActions.component";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'courseComponent',
   imports: [
     MatButtonModule,
@@ -62,14 +64,18 @@ ModuleRegistry.registerModules([AllCommunityModule]);
       (gridReady)="onGridReady($event)"
       (selectionChanged)="onSelectionChanged()"
       (cellEditRequest)="onCellValueChanged($event)"/>
-    <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>New course</button>
+    <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>
+      <mat-icon style="margin: 0;">add</mat-icon>
+    </button>
       `,
   styles: [`
-
     .mat-button{
       position: absolute;
       bottom:0;right:0;
+      height: 60px;
+      width: 60px;
       margin: 20px;
+      border-radius: 50%;
     }
   `
   ]

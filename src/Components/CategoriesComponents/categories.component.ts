@@ -61,16 +61,21 @@ ModuleRegistry.registerModules([AllCommunityModule]);
         (gridReady)="onGridReady($event)"
         (selectionChanged)="onSelectionChanged($event)"
         (cellEditRequest)="OnUpdateCategory($event)"/>
-      <button class="mat-button" mat-raised-buttom (click)="OpenAddCourseDialog()"  mat-flat-button>New category</button>
+      <button mat-raised-buttom (click)="OpenAddCourseDialog()" class="mat-button"  mat-flat-button>
+      <mat-icon style="margin: 0;">add</mat-icon>
+    </button>
     </div>        
   `,
   styles: [
     `
-      .mat-button{
-        position: absolute;
-        bottom:0;right:0;
-        margin: 20px;
-      }
+       .mat-button{
+      position: absolute;
+      bottom:0;right:0;
+      height: 60px;
+      width: 60px;
+      margin: 20px;
+      border-radius: 50%;
+    }
     `
   ]
 })
