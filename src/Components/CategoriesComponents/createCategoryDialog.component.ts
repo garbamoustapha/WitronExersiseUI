@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, model, computed, signal} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -17,6 +17,8 @@ import { CategoryStore } from '../../Stores/Category.store';
 import { SnackBarUtility } from '../../Utility/snackBar.utility';
 
 @Component({
+  standalone : true,
+  changeDetection : ChangeDetectionStrategy.OnPush,
   selector: 'app-creat-category-dialog',
   imports: [
     MatFormFieldModule,
@@ -27,20 +29,20 @@ import { SnackBarUtility } from '../../Utility/snackBar.utility';
     MatDialogContent,
     MatDialogActions,
   ],
-  template: `<h2 mat-dialog-title>Create new category</h2>
+  template: `<h2 mat-dialog-title>{{data ? "Edit Category" : "Create Category"}}</h2>
   <mat-dialog-content>
     <mat-form-field>
       <mat-label>Name</mat-label>
-      <input matInput [(ngModel)] = "categoryModel.name" />
+      <input matInput [(ngModel)] = "categoryModel().name" name="name" required/>
     </mat-form-field>
     <mat-form-field>
       <mat-label>Description</mat-label>
-      <textarea matInput [(ngModel)] = "categoryModel.description"> </textarea>
+      <textarea matInput [(ngModel)] = "categoryModel().description" required> </textarea>
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions>
     <button mat-button (click)="CloseDialog()" >Close</button>
-    <button mat-button  (click)="newCategory()">Create</button>
+    <button mat-button [disabled]="!isFormValid()" (click)="createOrEditCategory()">{{data ? "Edit" : "Create"}}</button>
   </mat-dialog-actions>`,
   styles: [`
     h2{
@@ -65,24 +67,36 @@ export class CreatCategoryDialogComponent {
   readonly dialogRef = inject(MatDialogRef);
   readonly categoryStore = inject(CategoryStore);
   snakbar = inject(SnackBarUtility);
-  categoryModel : Category = {
+  data = inject<Category>(MAT_DIALOG_DATA);  
+  initCat : Category = {
     id: "",
     name: "",
     description: "",
     createdDate: new Date(),
   }
- 
+
+  categoryModel = model(this.data ? {...this.data} : this.initCat);
+
+  isFormValid(): boolean {
+    return !!this.categoryModel().name && !!this.categoryModel().description;
+  } 
   CloseDialog()
   {
     this.dialogRef.close();
   }
 
+  createOrEditCategory() : void {
+    if(this.data)
+      this.updateCategory();
+    else
+      this.newCategory();
+  }
    newCategory()
   {
-    this.categoryModel.createdDate = new Date();
-    this.categoryModel.id = null;
+    this.categoryModel().createdDate = new Date();
+    this.categoryModel().id = null;
 
-    this.categoryStore.addCategory(this.categoryModel)
+    this.categoryStore.addCategory(this.categoryModel())
     .then((r : boolean) => {
       this.CloseDialog();
       this.snakbar.openSnackBar("Category created", "Close");
@@ -92,4 +106,16 @@ export class CreatCategoryDialogComponent {
       this.snakbar.openSnackBar("Category can't be created", "Close");
     })     
   }
+
+  updateCategory()
+  {
+    this.categoryStore.updateCategory(this.categoryModel()).then(() => {
+      this.CloseDialog();
+       this.snakbar.openSnackBar("Catery updated", "Close");
+    }).catch((error) => {
+      console.error("Erreur :", error);
+      this.snakbar.openSnackBar("Category can't be updated", "Close");
+    });
+  }
+
 }

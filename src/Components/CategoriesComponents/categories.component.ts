@@ -23,6 +23,8 @@ import { Category } from "../../Model/AllBaseModel";
 
 import {SnackBarUtility} from '../../Utility/snackBar.utility';
 
+import { AgGridActionsComponent } from "../../Utility/aggridActions.component";
+
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 
@@ -96,6 +98,20 @@ export class CategoriesComponent {
         valueFormatter: (params) => params.value ? new Date(params.value).toLocaleDateString() : "",
         editable: false
       },
+      { 
+        field: "actions" ,
+        cellRenderer: AgGridActionsComponent,
+         cellRendererParams: {
+          deleteBtnClick: (rowData: Category) => {
+            if(rowData.id)
+              this.deleteCourse(rowData.id);
+          },
+          updateBtnClick: (rowData: Category) => {
+            if(rowData.id)
+              this.OpenAddCourseDialog(rowData);
+          }
+        }                
+      }
   ];
 
   public getRowId : GetRowIdFunc = (params: GetRowIdParams<Category>) =>
@@ -118,9 +134,9 @@ export class CategoriesComponent {
     this.categoryStrore.loadAll();
   }
 
-  OpenAddCourseDialog()
+  OpenAddCourseDialog(category : Category | undefined = undefined)
   {
-    this.dialog.open(CreatCategoryDialogComponent);
+    this.dialog.open(CreatCategoryDialogComponent, {data: category});
   }
 
   onSelectionChanged(event: any) {
@@ -141,5 +157,12 @@ export class CategoriesComponent {
       });
       this.snackBar.openSnackBar("Categories deleted", "close");
     }
+  }
+
+  deleteCourse(id: string) {
+    if(!confirm(`Are you sure you want to delete categorie?`)) 
+      return;
+    this.categoryStrore.deleteCategory(id);
+    this.snackBar.openSnackBar("Category deleted", "close");
   }
 }

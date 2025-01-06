@@ -29,7 +29,7 @@ import { Title } from '@angular/platform-browser';
     MatDialogActions,
     MatSelectModule
     ],
-  template: `<h2 mat-dialog-title>{{data.id ? "Edit Course" : "Create Course"}}</h2>
+  template: `<h2 mat-dialog-title>{{data ? "Edit Course" : "Create Course"}}</h2>
   <mat-dialog-content>
     <mat-form-field>
       <mat-label>Title</mat-label>
@@ -55,7 +55,7 @@ import { Title } from '@angular/platform-browser';
   
   <mat-dialog-actions>
     <button mat-button (click)="CloseDialog()" >Close</button>
-    <button mat-button  cdkFocusInitial (click)="createOrEditCourse()">{{data.id ? "Update" : "Create"}}</button>
+    <button mat-button  cdkFocusInitial (click)="createOrEditCourse()">{{data ? "Update" : "Create"}}</button>
   </mat-dialog-actions>`,
   styles: [`
     h2{

@@ -2,6 +2,7 @@ import { signalStore, withState, withMethods,patchState } from "@ngrx/signals";
 import { Category } from "../Model/AllBaseModel";
 import { inject } from "@angular/core";
 import { CategoryService } from "../Services/category.service";
+import { lastValueFrom } from "rxjs";
 
 type CategoryState = {
   categories: Category[];
@@ -20,52 +21,47 @@ export const CategoryStore = signalStore(
   withState(initialState),
   withMethods((store, categoryService: CategoryService = inject(CategoryService)) => ({
     async loadAll(): Promise<void> {
-      await categoryService.getAllCategories().subscribe({
-        next: (categories) => {
-          console.log(categories);
-          patchState(store, (state)  => ({ categories: categories }));
-        },
-        error: (error) => {
-          console.error(error);
-          patchState(store, (state) => ({ categories: state.categories, error: error.message }));
-        }
-      });
-    },
+      try {
+        const categories = await lastValueFrom(categoryService.getAllCategories());
+        patchState(store, (state) => ({ categories: categories }));
+      } catch (error : any) {
+        console.error(error);
+        patchState(store, (state) => ({ categories: state.categories, error: error.message }));
+      }
+    },   
     async addCategory(category: Category): Promise<boolean> {
-       await categoryService.createCategory(category).subscribe({
-        next: (cat) => {
-          patchState(store, (state) => ({ categories: [...state.categories, cat] }))
-          return true;
-        },
-        error: (error) => {
-          console.error(error);
-          patchState(store, (state) => ({ categories: state.categories, error: error.message }));
-          return false;
-        }        
-      });
-      return false;
+      try {
+        const cat = await lastValueFrom(categoryService.createCategory(category));
+        patchState(store, (state) => ({ categories: [...state.categories, cat] }));
+        return true;
+      } catch (error : any) {
+        console.error(error);
+        patchState(store, (state) => ({ categories: state.categories, error: error.message }));
+        return false;
+      }
+    },  
+    async updateCategory(category: Category): Promise<void> {
+      try {
+        const cat = await lastValueFrom(categoryService.updateCategory(category));
+        patchState(store, (state) => ({
+          categories: state.categories.map((c) => (c.id === cat.id ? cat : c)),
+        }));
+      } catch (error : any) {
+        console.error(error);
+        patchState(store, (state) => ({ categories: state.categories, error: error.message }));
+      }
     },
-    updateCategory(category: Category): void {
-      categoryService.updateCategory(category).subscribe({
-        next: (cat) => {
-          patchState(store, (state) => ({ categories: state.categories.map(c => c.id === cat.id ? cat : c) }))
-        },
-        error: (error) => {
-          console.error(error);
-          patchState(store, (state) => ({ categories: state.categories, error: error.message }));
-        }
-      });
-    },
-    deleteCategory(id: string): void {
-      categoryService.deleteCategory(id).subscribe({
-        next: () => {
-          patchState(store, (state) => ({ categories: state.categories.filter(c => c.id !== id) }))
-        },
-        error: (error) => {
-          console.error(error);
-          patchState(store, (state) => ({ categories: state.categories, error: error.message }));
-        }
-      });
+    async deleteCategory(id: string): Promise<void> {
+      try {
+        await lastValueFrom(categoryService.deleteCategory(id));
+        patchState(store, (state) => ({
+          categories: state.categories.filter((c) => c.id !== id),
+        }));
+      } catch (error : any) {
+        console.error(error);
+        patchState(store, (state) => ({ categories: state.categories, error: error.message }));
+      }
     }
+    
   })) 
 );
