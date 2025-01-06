@@ -57,7 +57,7 @@ import { Title } from '@angular/platform-browser';
   
   <mat-dialog-actions>
     <button mat-button (click)="CloseDialog()" >Close</button>
-    <button mat-button  cdkFocusInitial (click)="createOrEditCourse()">{{data ? "Update" : "Create"}}</button>
+    <button mat-button [disabled]="!isFormValid()" cdkFocusInitial (click)="createOrEditCourse()">{{data ? "Update" : "Create"}}</button>
   </mat-dialog-actions>`,
   styles: [`
     h2{
@@ -102,6 +102,10 @@ export class CreateCourseDialogComponent {
 
     this.categoryStore.loadAll();
   }
+
+  isFormValid(): boolean {
+    return !!this.courseModel().title && !!this.courseModel().description && !!this.courseModel().instructorName && !!this.courseModel().categoryId;
+  } 
 
   createOrEditCourse() {
     if(this.courseModel().id){
