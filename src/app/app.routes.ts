@@ -3,7 +3,7 @@ import { CourseComponent } from '../Components/CoursesComponents/course.componen
 import { CategoriesComponent } from '../Components/CategoriesComponents/categories.component';
 
 export const routes: Routes = [
-  {path: '', component: CourseComponent},
+  { path: '', redirectTo: '/Courses', pathMatch: 'full' },
   {path: 'Courses', component: CourseComponent},
   {path: 'Categories', component: CategoriesComponent},
 ];

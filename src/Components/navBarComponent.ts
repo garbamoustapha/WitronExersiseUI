@@ -22,7 +22,7 @@ import { RouterOutlet } from '@angular/router';
         </button>
         <div class="navbar-logo" style="margin: 10px; font-size: 30px;">
           <span class="navbar-title">
-            <a class="TitleLink" routerLink="/"  ariaCurrentWhenActive="page">Learn</a>
+            <a class="TitleLink" routerLink="/Courses"  ariaCurrentWhenActive="page">Learn</a>
           </span>
         </div>  
       </mat-toolbar>
