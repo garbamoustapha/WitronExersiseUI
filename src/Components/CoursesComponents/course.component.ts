@@ -23,7 +23,7 @@ import {
 } from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
-import { Category, Course } from "../../Model/AllBaseModel";
+import { Course } from "../../Model/AllBaseModel";
 
 import { SnackBarUtility } from "../../Utility/snackBar.utility";
 import { AgGridActionsComponent } from "../../Utility/aggridActions.component";

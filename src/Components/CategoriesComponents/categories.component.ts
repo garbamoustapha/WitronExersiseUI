@@ -93,7 +93,7 @@ export class CategoriesComponent {
   colDefs: ColDef[] = [
       { 
         field: "Id" ,
-        valueGetter : (params) => params.data.id,
+        valueGetter : (params) => params.node && params.node.rowIndex !== null ? params.node.rowIndex + 1 : 0,
         checkboxSelection: true,             
       },
       { field: "name" },

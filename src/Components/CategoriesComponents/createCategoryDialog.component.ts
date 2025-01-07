@@ -1,9 +1,7 @@
-import {ChangeDetectionStrategy, Component, inject, model, computed, signal} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, model} from '@angular/core';
 import {
   MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogActions,
-  MatDialogClose,
   MatDialogContent,
   MatDialogRef,
   MatDialogTitle,
@@ -31,7 +29,7 @@ import { SnackBarUtility } from '../../Utility/snackBar.utility';
   ],
   template: `<h2 mat-dialog-title>{{data ? "Edit Category" : "Create Category"}}</h2>
   <mat-dialog-content>
-    <mat-form-field>
+    <mat-form-field style="padding-top:10px;">
       <mat-label>Name</mat-label>
       <input matInput [(ngModel)] = "categoryModel().name" name="name" required/>
     </mat-form-field>

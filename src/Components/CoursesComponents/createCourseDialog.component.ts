@@ -15,7 +15,6 @@ import { Course } from '../../Model/AllBaseModel';
 import { CategoryStore } from '../../Stores/Category.store';
 import { courseStore } from '../../Stores/course.store';
 import { SnackBarUtility } from '../../Utility/snackBar.utility';
-import { Title } from '@angular/platform-browser';
 
 @Component({
   standalone: true,
@@ -33,7 +32,7 @@ import { Title } from '@angular/platform-browser';
     ],
   template: `<h2 mat-dialog-title>{{data ? "Edit Course" : "Create Course"}}</h2>
   <mat-dialog-content>
-    <mat-form-field>
+    <mat-form-field style="padding-top:10px;">
       <mat-label>Title</mat-label>
       <input matInput [(ngModel)]= "courseModel().title" name="title" required/>
     </mat-form-field>
