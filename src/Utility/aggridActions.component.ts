@@ -1,9 +1,11 @@
-import { Component, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { ICellRendererAngularComp } from 'ag-grid-angular';
 import { ICellRendererParams, } from 'ag-grid-community';
 import { MatIcon } from '@angular/material/icon';
 
 @Component({
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'ag-grid-actions',
   imports: [MatIcon],
   template: `

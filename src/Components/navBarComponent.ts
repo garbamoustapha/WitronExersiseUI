@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {MatSidenavModule} from '@angular/material/sidenav';
@@ -8,6 +8,8 @@ import { RouterOutlet } from '@angular/router';
 
 
 @Component({
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'nav-bar',
   imports: [RouterLink, RouterLinkActive, CommonModule, MatSidenavModule, MatToolbarModule, MatIconModule, RouterOutlet],
   template: `
