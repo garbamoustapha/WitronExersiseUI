@@ -91,11 +91,6 @@ export class CategoriesComponent {
   // Row Data: The data to be displayed.
   // Column Definitions: Defines the columns to be displayed.
   colDefs: ColDef[] = [
-      { 
-        field: "Id" ,
-        valueGetter : (params) => params.node && params.node.rowIndex !== null ? params.node.rowIndex + 1 : 0,
-        checkboxSelection: true,             
-      },
       { field: "name" },
       { field: "description" , flex: 2},
       { 
